@@ -9,6 +9,8 @@
         "@babel/core": "^7.x",
         "@babel/preset-env": "^7.x",
         "@babel/preset-react": "^7.x",
+        "@types/react": "^19.1.8",
+        "@types/react-dom": "^19.1.6",
         "autoprefixer": "^10.x",
         "babel-loader": "^9.x",
         "css-loader": "^6.x",
@@ -16,6 +18,8 @@
         "postcss": "^8.x",
         "postcss-loader": "^7.x",
         "tailwindcss": "^3.x",
+        "ts-loader": "^9.5.2",
+        "typescript": "^5.8.3",
         "webpack": "^5.x",
         "webpack-cli": "^4.x"
     },

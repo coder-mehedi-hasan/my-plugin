@@ -3,8 +3,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: {
-        admin: './src/admin.jsx',
-        chatbox: './src/chatbox.jsx',
+        admin: './src/admin.tsx',
+        chatbox: './src/chatbox.tsx',
     },
     output: {
         path: path.resolve(__dirname, 'build'),
@@ -14,9 +14,9 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.(js|jsx)$/,
+                test: /\.(ts|tsx)$/,
                 exclude: /node_modules/,
-                use: ['babel-loader'],
+                use: 'ts-loader',
             },
             {
                 test: /\.css$/,
@@ -25,7 +25,7 @@ module.exports = {
         ],
     },
     resolve: {
-        extensions: ['.js', '.jsx'],
+        extensions: ['.tsx', '.ts', '.js', '.jsx'],
     },
     plugins: [
         new MiniCssExtractPlugin({
