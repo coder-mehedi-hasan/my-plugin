@@ -1,15 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { MyPluginData } from "../../utils/constant";
+import useEnvironments from "../../hooks/useEnvironments";
 
 export const SettingsTab = () => {
-    const [environments, setEnvironments] = useState([
-        {
-            id: 'openai',
-            name: 'OpenAI',
-            type: 'OpenRouter',
-            apiKey: '',
-        },
-    ]);
-    const [activeEnvId, setActiveEnvId] = useState('openai');
+    const { environments, refetch, setEnvironments } = useEnvironments();
+    const [activeEnvId, setActiveEnvId] = useState<string | null>(null);
 
     const types = [
         'OpenAI',
@@ -23,11 +18,11 @@ export const SettingsTab = () => {
     ];
 
     const updateEnv = (field: string, value: string) => {
-        setEnvironments(prev =>
-            prev.map(env =>
-                env.id === activeEnvId ? { ...env, [field]: value } : env
-            )
-        );
+        // setEnvironments(prev =>
+        //     prev.map(env =>
+        //         env.id === activeEnvId ? { ...env, [field]: value } : env
+        //     )
+        // );
     };
 
     const addEnvironment = () => {
@@ -40,12 +35,37 @@ export const SettingsTab = () => {
     };
 
     const deleteEnvironment = () => {
-        const filtered = environments.filter(env => env.id !== activeEnvId);
-        setEnvironments(filtered);
-        setActiveEnvId(filtered[0]?.id || '');
+        // const filtered = environments.filter(env => env.id !== activeEnvId);
+        // setEnvironments(filtered);
+        // setActiveEnvId(filtered[0]?.id || '');
     };
 
+    useEffect(() => {
+        if (!activeEnvId && environments?.length) {
+            setActiveEnvId(environments[0]?.id)
+        }
+    }, [environments])
+
     const env = environments.find(e => e.id === activeEnvId);
+
+    const saveToServer = () => {
+        fetch(`${MyPluginData.apiUrl}my-plugin/v1/environments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': MyPluginData.nonce,
+            },
+            body: JSON.stringify(environments),
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Environments saved successfully!');
+                } else {
+                    alert('Failed to save.');
+                }
+            });
+    };
 
     return (
         <div className="flex flex-col lg:flex-row gap-6">
@@ -124,13 +144,16 @@ export const SettingsTab = () => {
                             >
                                 Delete
                             </button>
+                            <button onClick={saveToServer} className="bg-blue-600 text-white px-4 py-2 rounded">
+                                💾 Save Environments
+                            </button>
                         </div>
                     </>
                 )}
             </div>
 
             {/* Right panel with global toggles */}
-            <div className="w-full lg:w-80 space-y-4 bg-white p-6 rounded shadow">
+            {/* <div className="w-full lg:w-80 space-y-4 bg-white p-6 rounded shadow">
                 <h3 className="text-lg font-bold mb-2">General</h3>
                 {['Streaming', 'Event Logs', 'Responses API'].map(setting => (
                     <label key={setting} className="flex items-center space-x-2">
@@ -138,7 +161,7 @@ export const SettingsTab = () => {
                         <span className="font-medium">{setting}</span>
                     </label>
                 ))}
-            </div>
+            </div> */}
         </div>
     );
 };

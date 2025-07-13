@@ -1,0 +1,36 @@
+{
+    "providers": [
+        {
+            "slug": "openai",
+            "name": "OpenAI"
+        },
+        {
+            "slug": "anthropic",
+            "name": "Anthropic"
+        },
+        {
+            "slug": "azure-openai",
+            "name": "Azure (OpenAI)"
+        },
+        {
+            "slug": "google",
+            "name": "Google"
+        },
+        {
+            "slug": "openrouter",
+            "name": "OpenRouter"
+        },
+        {
+            "slug": "huggingface",
+            "name": "Hugging Face"
+        },
+        {
+            "slug": "replicate",
+            "name": "Replicate"
+        },
+        {
+            "slug": "perplexity",
+            "name": "Perplexity"
+        }
+    ]
+}

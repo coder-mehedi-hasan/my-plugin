@@ -14,6 +14,9 @@ define('MY_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
 require_once MY_PLUGIN_PATH . 'admin/class-my-plugin-admin.php';
 require_once MY_PLUGIN_PATH . 'user/class-my-plugin-frontend.php';
+require_once MY_PLUGIN_PATH . 'admin/class-my-plugin-settings-api.php';
+require_once MY_PLUGIN_PATH . 'admin/class-my-plugin-chatbots-api.php';
+require_once MY_PLUGIN_PATH . 'admin/class-my-plugin-engine-api.php';
 
 final class My_React_Plugin
 {
@@ -26,6 +29,9 @@ final class My_React_Plugin
     {
         new My_Plugin_Admin();
         new My_Plugin_Frontend();
+        new My_Plugin_Settings_API();
+        new My_Plugin_Chatbots_API();
+        new My_Plugin_Engine_API();
     }
 }
 
