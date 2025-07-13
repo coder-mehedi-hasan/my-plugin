@@ -1,15 +1,19 @@
+import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { ChatbotsTab } from '../components/admin/ChatbotsTab';
+import { SettingsTab } from '../components/admin/SettingsTab';
+import { TabHeader } from '../components/admin/TabHeader';
 import '../index.css';
 
-const AdminApp = () => {
+const AdminApp: React.FC = () => {
+    const [activeTab, setActiveTab] = useState('Chatbots');
+
     return (
-        <div className="p-6 space-y-4">
-            <h2 className="text-2xl font-bold">React AI Chatbot</h2>
-            {/* Mimic layout from uploaded image */}
-            <div className="bg-white p-4 rounded shadow">
-                <p className="font-semibold">Environment Settings</p>
-                {/* Form inputs go here */}
-            </div>
+        <div className="p-6 text-gray-800">
+            <h1 className="text-2xl font-bold mb-4">AI Plugin Settings</h1>
+            <TabHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+            {activeTab === 'Chatbots' && <ChatbotsTab />}
+            {activeTab === 'Settings' && <SettingsTab />}
         </div>
     );
 };
