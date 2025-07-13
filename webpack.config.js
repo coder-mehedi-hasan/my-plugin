@@ -3,7 +3,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: {
-        admin: './src/admin.tsx',
+        admin: './src/admin/admin.tsx',
         chatbox: './src/chatbox.tsx',
     },
     output: {
