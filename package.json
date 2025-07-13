@@ -1,0 +1,26 @@
+{
+    "name": "my-plugin",
+    "version": "1.0.0",
+    "scripts": {
+        "build": "webpack --mode production",
+        "dev": "webpack --mode development --watch"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.x",
+        "@babel/preset-env": "^7.x",
+        "@babel/preset-react": "^7.x",
+        "autoprefixer": "^10.x",
+        "babel-loader": "^9.x",
+        "css-loader": "^6.x",
+        "mini-css-extract-plugin": "^2.x",
+        "postcss": "^8.x",
+        "postcss-loader": "^7.x",
+        "tailwindcss": "^3.x",
+        "webpack": "^5.x",
+        "webpack-cli": "^4.x"
+    },
+    "dependencies": {
+        "react": "^18.x",
+        "react-dom": "^18.x"
+    }
+}
