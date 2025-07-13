@@ -76,6 +76,7 @@ class My_Plugin_Engine_API
             'baseUrl' => esc_url_raw($bot['environment']['baseUrl'] ?? ''),
             'context' => sanitize_textarea_field($bot['context'] ?? ''),
             'prompt'  => $prompt,
+            "messages" => $params["messages"]
         ]); // This will exit early
     }
 

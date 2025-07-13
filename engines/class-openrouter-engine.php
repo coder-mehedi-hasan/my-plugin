@@ -64,30 +64,32 @@ class My_Plugin_OpenRouter_Engine implements My_Plugin_Engine_Interface
 
     public function stream_message(array $params)
     {
-        $api_key  = sanitize_text_field($params['apiKey'] ?? '');
-        $model    = sanitize_text_field($params['model'] ?? '');
-        $prompt   = sanitize_textarea_field($params['prompt'] ?? '');
-        $context  = sanitize_textarea_field($params['context'] ?? '');
-        $raw_base = trim($params['baseUrl'] ?? '');
-        $base_url = esc_url_raw($raw_base);
+        $api_key   = sanitize_text_field($params['apiKey'] ?? '');
+        $model     = sanitize_text_field($params['model'] ?? '');
+        $context   = sanitize_textarea_field($params['context'] ?? '');
+        $raw_base  = trim($params['baseUrl'] ?? '');
+        $base_url  = esc_url_raw($raw_base);
+        $messages  = $params['messages'] ?? [];
+
         if (empty($base_url)) {
             $base_url = 'https://openrouter.ai/api/v1';
         }
 
-        if (!$api_key || !$model || !$prompt) {
+        if (!$api_key || !$model || !is_array($messages) || count($messages) === 0) {
             status_header(400);
-            echo "Missing parameters";
+            echo "Missing or invalid parameters.";
             exit;
         }
 
-        // Prepare messages
-        $messages = [];
+        // Optional: prepend context as a system message if not already provided
+        $has_system = array_filter($messages, fn($msg) => $msg['role'] === 'system');
 
-        if (!empty($context)) {
-            $messages[] = ['role' => 'system', 'content' => $context];
+        if ($context && empty($has_system)) {
+            array_unshift($messages, [
+                'role' => 'system',
+                'content' => $context,
+            ]);
         }
-
-        $messages[] = ['role' => 'user', 'content' => $prompt];
 
         // Prepare cURL manually
         $ch = curl_init();
