@@ -62,6 +62,68 @@ class My_Plugin_OpenRouter_Engine implements My_Plugin_Engine_Interface
     }
 
 
+    public function stream_message(array $params)
+    {
+        $api_key  = sanitize_text_field($params['apiKey'] ?? '');
+        $model    = sanitize_text_field($params['model'] ?? '');
+        $prompt   = sanitize_textarea_field($params['prompt'] ?? '');
+        $context  = sanitize_textarea_field($params['context'] ?? '');
+        $raw_base = trim($params['baseUrl'] ?? '');
+        $base_url = esc_url_raw($raw_base);
+        if (empty($base_url)) {
+            $base_url = 'https://openrouter.ai/api/v1';
+        }
+
+        if (!$api_key || !$model || !$prompt) {
+            status_header(400);
+            echo "Missing parameters";
+            exit;
+        }
+
+        // Prepare messages
+        $messages = [];
+
+        if (!empty($context)) {
+            $messages[] = ['role' => 'system', 'content' => $context];
+        }
+
+        $messages[] = ['role' => 'user', 'content' => $prompt];
+
+        // Prepare cURL manually
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $base_url . '/chat/completions');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $api_key,
+            'Content-Type: application/json',
+            'Accept: text/event-stream',
+            'Referer: ' . home_url(),
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+            'model'    => $model,
+            'stream'   => true,
+            'messages' => $messages,
+        ]));
+
+        curl_setopt($ch, CURLOPT_WRITEFUNCTION, function ($ch, $chunk) {
+            echo $chunk;
+            @ob_flush();
+            flush();
+            return strlen($chunk);
+        });
+
+        // Required for real-time output
+        header('Content-Type: text/event-stream');
+        header('Cache-Control: no-cache');
+        header('Connection: keep-alive');
+
+        curl_exec($ch);
+        curl_close($ch);
+        exit;
+    }
+
+
     public function fetch_models(array $params): WP_REST_Response|WP_Error
     {
         $api_key  = sanitize_text_field($params['apiKey'] ?? '');

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import { MyPluginData } from './utils/constant';
+import { ChatBar } from './components/common/Chatbox';
 
 type Message = {
     role: 'user' | 'assistant' | any;
@@ -59,6 +60,8 @@ const Chatbox = () => {
             sendMessage();
         }
     };
+
+    return <ChatBar />
 
     return (
         <div className="bg-white p-4 rounded shadow-lg border w-full max-w-md mx-auto">
