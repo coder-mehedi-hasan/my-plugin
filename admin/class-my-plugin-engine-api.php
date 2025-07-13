@@ -27,10 +27,46 @@ class My_Plugin_Engine_API
 
     public function handle_send($request)
     {
+
         $params = $request->get_json_params();
-        $engine = My_Plugin_Engine_Loader::get_engine($params['type'] ?? '');
-        return $engine ? $engine->send_message($params) : new WP_Error('invalid_engine', 'Unsupported engine type', ['status' => 400]);
+        $chatbot_id = sanitize_text_field($params['chatbotId'] ?? '');
+        $prompt     = sanitize_textarea_field($params['prompt'] ?? '');
+
+
+        if (!$chatbot_id || !$prompt) {
+            return new WP_Error('missing_data', 'Chatbot ID and prompt required.', ['status' => 400]);
+        }
+
+        // 🔍 Fetch chatbots config from wp_options
+        $chatbots = get_option('my_plugin_chatbots', []);
+        $bot = null;
+
+        foreach ($chatbots as $item) {
+            if ($item['id'] === $chatbot_id) {
+                $bot = $item;
+                break;
+            }
+        }
+
+        if (!$bot || !isset($bot['environment']['type'], $bot['environment']['apiKey'], $bot['model'])) {
+            return new WP_Error('not_found', 'Chatbot or environment not properly configured.', ['status' => 404]);
+        }
+
+        // Build payload
+        $engine = My_Plugin_Engine_Loader::get_engine($bot['environment']['type']);
+        if (!$engine) {
+            return new WP_Error('invalid_engine', 'No engine found for this environment type.', ['status' => 400]);
+        }
+        
+        return $engine->send_message([
+            'model'   => sanitize_text_field($bot['model']),
+            'apiKey'  => sanitize_text_field($bot['environment']['apiKey']),
+            'baseUrl' => esc_url_raw($bot['environment']['baseUrl'] ?? ''),
+            'context' => sanitize_textarea_field($bot['context'] ?? ''),
+            'prompt'  => $prompt,
+        ]);
     }
+
 
     public function handle_models($request)
     {
