@@ -96,7 +96,7 @@ const ChatbotEditor: React.FC<Props> = ({
             <div className="text-sm text-gray-500">
                 Shortcode:{' '}
                 <code className="bg-gray-100 px-2 py-1 rounded">
-                    [my_plugin_chatbot id="{bot.id}"]
+                    [my_plugin_chatbox id="{bot.id}"]
                 </code>
             </div>
 
