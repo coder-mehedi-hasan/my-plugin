@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { MyPluginData } from "../../utils/constant";
 import useEnvironments from "../../hooks/useEnvironments";
+import { MyPluginData } from "../../utils/constant";
 
 export const SettingsTab = () => {
-    const { environments, refetch, setEnvironments } = useEnvironments();
+    const { environments, setEnvironments } = useEnvironments();
+    // const [environments, setEnvironments] = useState<EnvironmentConfig[]>([]);
     const [activeEnvId, setActiveEnvId] = useState<string | null>(null);
 
     const types = [
@@ -18,11 +19,11 @@ export const SettingsTab = () => {
     ];
 
     const updateEnv = (field: string, value: string) => {
-        // setEnvironments(prev =>
-        //     prev.map(env =>
-        //         env.id === activeEnvId ? { ...env, [field]: value } : env
-        //     )
-        // );
+        setEnvironments(prev =>
+            prev.map(env =>
+                env.id === activeEnvId ? { ...env, [field]: value } : env
+            )
+        );
     };
 
     const addEnvironment = () => {
