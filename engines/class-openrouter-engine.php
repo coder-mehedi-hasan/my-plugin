@@ -6,6 +6,11 @@ require_once __DIR__ . '/class-engine-interface.php';
 class My_Plugin_OpenRouter_Engine implements My_Plugin_Engine_Interface
 {
     private $base_url = "https://openrouter.ai/api/v1";
+    private $tools = [];
+    public function __construct()
+    {
+        $this->tools = My_Plugin_Tool_Registry::get_all_tools();
+    }
 
     public function send_message(array $params): WP_REST_Response|WP_Error
     {

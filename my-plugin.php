@@ -12,13 +12,12 @@ define('MY_PLUGIN_VERSION', '1.0.0');
 define('MY_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MY_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
+require_once MY_PLUGIN_PATH . 'tools/class-tool-registry.php';
 require_once MY_PLUGIN_PATH . 'admin/class-my-plugin-admin.php';
 require_once MY_PLUGIN_PATH . 'user/class-my-plugin-frontend.php';
 require_once MY_PLUGIN_PATH . 'admin/class-my-plugin-settings-api.php';
 require_once MY_PLUGIN_PATH . 'admin/class-my-plugin-chatbots-api.php';
 require_once MY_PLUGIN_PATH . 'admin/class-my-plugin-engine-api.php';
-require_once MY_PLUGIN_PATH . 'tools/class-tool-registry.php';
-$tools = My_Plugin_Tool_Registry::get_all_tools();
 
 final class My_React_Plugin
 {
