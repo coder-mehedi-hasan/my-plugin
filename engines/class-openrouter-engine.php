@@ -5,6 +5,8 @@ require_once __DIR__ . '/class-engine-interface.php';
 
 class My_Plugin_OpenRouter_Engine implements My_Plugin_Engine_Interface
 {
+    private $base_url = "https://openrouter.ai/api/v1";
+
     public function send_message(array $params): WP_REST_Response|WP_Error
     {
         $api_key  = sanitize_text_field($params['apiKey'] ?? '');
@@ -16,7 +18,7 @@ class My_Plugin_OpenRouter_Engine implements My_Plugin_Engine_Interface
         $raw_base = trim($params['baseUrl'] ?? '');
         $base_url = esc_url_raw($raw_base);
         if (empty($base_url)) {
-            $base_url = 'https://openrouter.ai/api/v1';
+            $base_url = $this->base_url;;
         }
 
         if (!$api_key || !$model || !$prompt) {
@@ -61,7 +63,6 @@ class My_Plugin_OpenRouter_Engine implements My_Plugin_Engine_Interface
         ]);
     }
 
-
     public function stream_message(array $params)
     {
         $api_key   = sanitize_text_field($params['apiKey'] ?? '');
@@ -72,7 +73,7 @@ class My_Plugin_OpenRouter_Engine implements My_Plugin_Engine_Interface
         $messages  = $params['messages'] ?? [];
 
         if (empty($base_url)) {
-            $base_url = 'https://openrouter.ai/api/v1';
+            $base_url = $this->base_url;;
         }
 
         if (!$api_key || !$model || !is_array($messages) || count($messages) === 0) {
@@ -129,7 +130,7 @@ class My_Plugin_OpenRouter_Engine implements My_Plugin_Engine_Interface
     public function fetch_models(array $params): WP_REST_Response|WP_Error
     {
         $api_key  = sanitize_text_field($params['apiKey'] ?? '');
-        $base_url = esc_url_raw($params['baseUrl'] ?? 'https://openrouter.ai/api/v1');
+        $base_url = esc_url_raw($params['baseUrl'] ?? $this->base_url);
 
         $response = wp_remote_get("$base_url/models", [
             'headers' => [
