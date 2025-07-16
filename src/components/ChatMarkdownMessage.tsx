@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
@@ -32,7 +32,15 @@ const ChatMarkdownMessage: React.FC<Props> = ({ content, className }) => {
                         return (
                             <div className="relative group">
                                 <button
-                                    onClick={() => navigator.clipboard.writeText(extractCodeString(children))}
+                                    onClick={async (event) => {
+                                        navigator.clipboard.writeText(extractCodeString(children));
+                                        event.currentTarget.innerText = "Copied!"
+                                        await new Promise((resolve) => {
+                                            setTimeout(resolve, 1000)
+                                        });
+                                        //@ts-ignore
+                                        event.target.innerText = "Copy"
+                                    }}
                                     className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 px-2 py-1 rounded transition-all duration-200"
                                 >
                                     Copy
