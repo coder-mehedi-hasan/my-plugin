@@ -111,7 +111,7 @@ const Chatbox = ({ ...props }) => {
 
     return (
         <div className="bg-white p-4 rounded shadow-lg border w-full mx-auto text-sm">
-            <h4 className="font-bold text-lg mb-2">AI Chat</h4>
+            {/* <h4 className="font-bold text-lg mb-2">AI Chat</h4> */}
 
             <div className="h-64 overflow-y-auto bg-gray-50 p-3 rounded space-y-3">
                 {messages.map((msg, i) => {
