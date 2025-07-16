@@ -33,8 +33,15 @@ class My_Plugin_Frontend
         ]);
     }
 
-    public function render_chatbox_shortcode()
+    public function render_chatbox_shortcode($atts)
     {
-        return '<div id="my-plugin-chatbox-root"></div>';
+        $atts = shortcode_atts(array(
+            'id' => 'default',
+        ), $atts, 'my_plugin_chatbox');
+
+        $bot_id = esc_attr($atts['id']);
+
+        return '<div id="my-plugin-chatbox-root" data-bot-id="' . $bot_id . '"></div>';
+        // return '<div id="my-plugin-chatbox-root"></div>';
     }
 }

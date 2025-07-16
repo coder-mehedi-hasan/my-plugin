@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 type ChatMessage = {
     role: 'user' | 'assistant';
     content: string;
 };
 
-const Chatbox = () => {
-    const chatbotId = 'default';
+const Chatbox = ({ ...props }) => {
+    const chatbotId = props?.botId;
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [isStreaming, setIsStreaming] = useState(false);
@@ -162,4 +162,4 @@ const Chatbox = () => {
     );
 };
 
-export default Chatbox;
+export default memo(Chatbox);
