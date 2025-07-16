@@ -9,6 +9,8 @@ class My_Plugin_Tool_Dispatcher
                 return self::convert_csv_to_json($args['csv_url'] ?? '');
             case 'summarize_json_data':
                 return self::summarize_json_data($args['json_string'] ?? '');
+            case 'get_biodata':
+                return self::get_biodata($args['name'] ?? '');
             default:
                 return ['error' => 'Tool not found'];
         }
@@ -46,6 +48,21 @@ class My_Plugin_Tool_Dispatcher
         return ['json' => $json_array];
     }
 
+    private static function get_biodata(string $name): array
+    {
+        // In a real case, you'd query a DB or user profile.
+        if (strtolower($name) === 'mehedi') {
+            return [
+                'name'       => 'Mehedi Hasan',
+                'dob'        => '1997-05-18',
+                'education'  => 'BSc in Computer Science',
+                'location'   => 'Dhaka, Bangladesh',
+                'interests'  => ['AI', 'Web Development', 'Open Source'],
+            ];
+        }
+
+        return ['error' => 'No biodata found for ' . $name];
+    }
 
     private static function summarize_json_data(string $json): array
     {

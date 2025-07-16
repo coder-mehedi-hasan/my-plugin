@@ -1,7 +1,9 @@
 <?php
 
-class My_Plugin_Tool_Registry {
-    public static function get_all_tools(): array {
+class My_Plugin_Tool_Registry
+{
+    public static function get_all_tools(): array
+    {
         return [
             [
                 'type' => 'function',
@@ -37,10 +39,21 @@ class My_Plugin_Tool_Registry {
                     ],
                 ],
             ],
+            [
+                'name' => 'get_biodata',
+                'description' => 'Returns biodata of the user based on their name.',
+                'parameters' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'name' => [
+                            'type' => 'string',
+                            'description' => 'The full name of the user whose biodata is requested.',
+                        ],
+                    ],
+                    'required' => ['name'],
+                ]
+            ]
             // Add more tools here
         ];
     }
 }
-
-
-?>
