@@ -1,4 +1,5 @@
 import { memo, useEffect, useRef, useState } from 'react';
+import ChatMarkdownMessage from '../ChatMarkdownMessage';
 
 type ChatMessage = {
     role: 'user' | 'assistant';
@@ -113,18 +114,23 @@ const Chatbox = ({ ...props }) => {
             <h4 className="font-bold text-lg mb-2">AI Chat</h4>
 
             <div className="h-64 overflow-y-auto bg-gray-50 p-3 rounded space-y-3">
-                {messages.map((msg, i) => (
-                    <div key={i} className={msg.role === 'user' ? 'text-right' : 'text-left'}>
-                        <div
-                            className={`inline-block px-3 py-2 rounded max-w-[90%] ${msg.role === 'user'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-gray-200 text-gray-700'
-                                }`}
-                        >
-                            {msg.content}
-                        </div>
-                    </div>
-                ))}
+                {messages.map((msg, i) => {
+                    const isBot = msg?.role === "assistant";
+                    return isBot ?
+                        <ChatMarkdownMessage content={msg?.content} key={msg.role + i}></ChatMarkdownMessage>
+                        : (
+                            <div key={i} className={msg.role === 'user' ? 'text-right' : 'text-left'}>
+                                <div
+                                    className={`inline-block px-3 py-2 rounded max-w-[90%] ${msg.role === 'user'
+                                        ? 'bg-blue-100 text-blue-800'
+                                        : 'bg-gray-200 text-gray-700'
+                                        }`}
+                                >
+                                    {msg.content}
+                                </div>
+                            </div>
+                        )
+                })}
                 {isStreaming && (
                     <div className="text-gray-400 italic">Assistant is typing...</div>
                 )}
