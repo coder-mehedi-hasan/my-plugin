@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { MyPluginData } from '../../utils/constant';
 import useEnvironments from '../../hooks/useEnvironments';
-import useModels from '../../hooks/useModels';
+import { MyPluginData } from '../../utils/constant';
 import ChatbotEditor from './ChatbotEditor';
 
 type ChatbotConfig = {

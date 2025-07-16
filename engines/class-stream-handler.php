@@ -2,8 +2,9 @@
 
 if (!defined('ABSPATH')) exit;
 
-require_once __DIR__ . '/../tools/class-tool-registry.php';
-require_once __DIR__ . '/../tools/class-tool-dispatcher.php';
+require_once MY_PLUGIN_PATH . 'tools/class-tool-registry.php';
+require_once MY_PLUGIN_PATH . 'tools/class-tool-dispatcher.php';
+
 
 class My_Plugin_Stream_Handler
 {

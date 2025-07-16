@@ -1,7 +1,8 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-require_once __DIR__ . '/class-openrouter-engine.php';
+require_once MY_PLUGIN_PATH . 'engines/class-openrouter-engine.php';
+
 
 class My_Plugin_Engine_Loader
 {
