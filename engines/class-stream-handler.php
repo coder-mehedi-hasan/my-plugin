@@ -20,7 +20,6 @@ class My_Plugin_Stream_Handler
         if ($context && empty($has_system)) {
             array_unshift($messages, ['role' => 'system', 'content' => $context]);
         }
-
         // Step 1: Dry-run request (no stream) to check for tool calls
         $dry_body = wp_json_encode([
             'model'       => $model,
@@ -43,7 +42,6 @@ class My_Plugin_Stream_Handler
             echo "API Error: " . esc_html($dry_response->get_error_message());
             exit;
         }
-
         $data = json_decode(wp_remote_retrieve_body($dry_response), true);
         $tool_calls = $data['choices'][0]['message']['tool_calls'] ?? [];
 
