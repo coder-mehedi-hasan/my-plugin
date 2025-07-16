@@ -1,7 +1,8 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-require_once __DIR__ . '/class-engine-interface.php';
+require_once MY_PLUGIN_PATH . 'engines/class-engine-interface.php';
+require_once MY_PLUGIN_PATH . 'engines/class-stream-handler.php';
 
 class My_Plugin_OpenRouter_Engine implements My_Plugin_Engine_Interface
 {
@@ -131,6 +132,18 @@ class My_Plugin_OpenRouter_Engine implements My_Plugin_Engine_Interface
         exit;
     }
 
+    public function stream_message_raw(array $params)
+    {
+        $api_key   = sanitize_text_field($params['apiKey'] ?? '');
+        $model     = sanitize_text_field($params['model'] ?? '');
+        $context   = sanitize_textarea_field($params['context'] ?? '');
+        $raw_base  = trim($params['baseUrl'] ?? '');
+        $base_url  = esc_url_raw($raw_base) ?: $this->base_url;
+        $messages  = $params['messages'] ?? [];
+
+        $handler = new My_Plugin_Stream_Handler();
+        $handler->handle($base_url, $api_key, $model, $messages, $context);
+    }
 
     public function fetch_models(array $params): WP_REST_Response|WP_Error
     {

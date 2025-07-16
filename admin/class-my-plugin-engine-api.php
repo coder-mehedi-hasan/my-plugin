@@ -70,7 +70,7 @@ class My_Plugin_Engine_API
             return new WP_Error('stream_unsupported', 'Engine does not support streaming.', ['status' => 400]);
         }
 
-        $engine->stream_message([
+        $engine->stream_message_raw([
             'model'   => sanitize_text_field($bot['model']),
             'apiKey'  => sanitize_text_field($bot['environment']['apiKey']),
             'baseUrl' => esc_url_raw($bot['environment']['baseUrl'] ?? ''),

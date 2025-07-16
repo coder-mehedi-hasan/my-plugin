@@ -7,7 +7,7 @@ class My_Plugin_Tool_Registry {
                 'type' => 'function',
                 'function' => [
                     'name' => 'convert_csv_to_json',
-                    'description' => 'Converts a CSV file (given by URL) into JSON.',
+                    'description' => 'You are an AI assistant. You have access to tools like `convert_csv_to_json`. When the user provides a CSV file URL, call the appropriate tool with `{ csv_url: "..." }`',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
