@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react';
 import useEnvironments from '../../hooks/useEnvironments';
+import { ChatbotConfig } from '../../types/types';
+import { get, remove } from '../../utils/api';
 import { MyPluginData } from '../../utils/constant';
 import ChatbotEditor from './ChatbotEditor';
-
-type ChatbotConfig = {
-    id: string;
-    name: string;
-    environment: any;
-    model: string;
-    context: string;
-};
+import endpoints from '../../utils/endpoints';
+import toast from 'react-hot-toast';
 
 const defaultBot: ChatbotConfig = {
     id: 'default',
@@ -45,10 +41,19 @@ export const ChatbotsTab = () => {
         setActiveId(newId);
     };
 
-    const deleteBot = () => {
-        const filtered = bots.filter(bot => bot.id !== activeId);
-        setBots(filtered);
-        setActiveId(filtered[0]?.id || '');
+    const deleteBot = async () => {
+        try {
+            await remove(endpoints.chatbots.byId(activeId));
+            const filtered = bots.filter(bot => bot.id !== activeId);
+            setBots(filtered);
+            setActiveId(filtered[0]?.id || '');
+            toast.success("Bot deleted!")
+        } catch (error: any) {
+            console.log("Error to delete bot! ", error?.response?.data);
+            toast.error(error?.response?.data?.message);
+        }
+
+
     };
 
     const duplicateBot = () => {
@@ -63,16 +68,11 @@ export const ChatbotsTab = () => {
     };
 
     useEffect(() => {
-        fetch(`${MyPluginData.apiUrl}my-plugin/v1/chatbots`, {
-            headers: {
-                'X-WP-Nonce': MyPluginData.nonce,
-            },
-        })
-            .then(res => res.json())
+        get(endpoints.chatbots.base)
             .then(data => {
-                if (Array.isArray(data) && data.length > 0) {
-                    setBots(data);
-                    setActiveId(data[0].id);
+                if (Array.isArray(data?.data) && data?.data.length > 0) {
+                    setBots(data?.data);
+                    setActiveId(data?.data[0].id);
                 }
             });
     }, []);
@@ -89,7 +89,7 @@ export const ChatbotsTab = () => {
         })
             .then(res => res.json())
             .then(res => {
-                if (res.success) alert('Chatbots saved successfully');
+                if (res.success) toast.success('Chatbots saved successfully');
             });
     };
 

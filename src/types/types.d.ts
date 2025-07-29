@@ -29,3 +29,11 @@ export interface EnvironmentConfig {
     baseUrl?: string;        // Optional: for custom hosts (e.g., Azure or OpenRouter)
     customHeaders?: Record<string, string>; // Optional for advanced API config
 }
+
+export type ChatbotConfig = {
+    id: string;
+    name: string;
+    environment: any;
+    model: string;
+    context: string;
+};

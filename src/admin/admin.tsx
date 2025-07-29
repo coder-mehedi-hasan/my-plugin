@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Toaster } from 'react-hot-toast';
 import { ChatbotsTab } from '../components/admin/ChatbotsTab';
 import { SettingsTab } from '../components/admin/SettingsTab';
 import { TabHeader } from '../components/admin/TabHeader';
@@ -14,6 +15,11 @@ const AdminApp: React.FC = () => {
             <TabHeader activeTab={activeTab} setActiveTab={setActiveTab} />
             {activeTab === 'Chatbots' && <ChatbotsTab />}
             {activeTab === 'Settings' && <SettingsTab />}
+            <Toaster
+                containerStyle={{
+                    marginTop: '24px',
+                }}
+            />
         </div>
     );
 };

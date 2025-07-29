@@ -6,7 +6,6 @@ export default function useModels(environment: EnvironmentConfig | null) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    console.log(environment)
     useEffect(() => {
         if (!environment) return;
 
