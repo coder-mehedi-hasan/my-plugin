@@ -6,6 +6,7 @@ import { MyPluginData } from '../../utils/constant';
 import ChatbotEditor from './ChatbotEditor';
 import endpoints from '../../utils/endpoints';
 import toast from 'react-hot-toast';
+import { generateRandomString } from '../../utils/helper';
 
 const defaultBot: ChatbotConfig = {
     id: 'default',
@@ -31,7 +32,7 @@ export const ChatbotsTab = () => {
     };
 
     const addBot = () => {
-        const newId = `bot${bots.length + 1}`;
+        const newId = `bot-${generateRandomString(10)}`;
         const newBot = {
             ...defaultBot,
             id: newId,
@@ -44,16 +45,14 @@ export const ChatbotsTab = () => {
     const deleteBot = async () => {
         try {
             await remove(endpoints.chatbots.byId(activeId));
-            const filtered = bots.filter(bot => bot.id !== activeId);
-            setBots(filtered);
-            setActiveId(filtered[0]?.id || '');
             toast.success("Bot deleted!")
         } catch (error: any) {
             console.log("Error to delete bot! ", error?.response?.data);
             toast.error(error?.response?.data?.message);
         }
-
-
+        const filtered = bots.filter(bot => bot.id !== activeId);
+        setBots(filtered);
+        setActiveId(filtered[0]?.id || '');
     };
 
     const duplicateBot = () => {
