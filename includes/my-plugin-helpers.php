@@ -23,3 +23,4 @@ if (!function_exists('my_plugin_log')) {
         file_put_contents($log_file, $formatted, FILE_APPEND);
     }
 }
+?>

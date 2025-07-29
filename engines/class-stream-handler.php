@@ -25,23 +25,24 @@ class My_Plugin_Stream_Handler
         $tools = My_Plugin_Tool_Registry::get_all_tools();
 
         // Step 1: Dry-run request (no stream) to check for tool calls
-        $body = wp_json_encode([
+        $body = json_encode([
             'model'    => $model,
             'messages' => $messages,
             'tools'    => $tools,
             'tool_choice' => 'auto',
         ]);
 
-        $ch = curl_init("$base_url/chat/completions");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "Authorization: Bearer $api_key",
-            'Content-Type: application/json',
-            'Referer: ' . home_url(),
-        ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+        $ch = $this->setup_curl(
+            "$base_url/chat/completions",
+            $api_key,
+            [
+                "Authorization: Bearer $api_key",
+                'Content-Type: application/json',
+                'Referer: ' . home_url(),
+            ],
+            $body,
+            false
+        );
 
         $response = curl_exec($ch);
 
@@ -54,7 +55,7 @@ class My_Plugin_Stream_Handler
         curl_close($ch);
         $data = json_decode($response, true);
         $tool_calls = $data['choices'][0]['message']['tool_calls'] ?? [];
-        
+
         // Step 2: Handle tool calls if present
         if (!empty($tool_calls)) {
             foreach ($tool_calls as $tool) {
@@ -73,29 +74,24 @@ class My_Plugin_Stream_Handler
         header('Cache-Control: no-cache');
         header('Connection: keep-alive');
 
-        $ch = curl_init("$base_url/chat/completions");
+        $stream_body = json_encode([
+            'model'    => $model,
+            'stream'   => true,
+            'messages' => $messages,
+        ]);
 
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER    => false,
-            CURLOPT_POST              => true,
-            CURLOPT_HTTPHEADER        => [
+        $ch = $this->setup_curl(
+            "$base_url/chat/completions",
+            $api_key,
+            [
                 "Authorization: Bearer $api_key",
                 'Content-Type: application/json',
                 'Accept: text/event-stream',
                 'Referer: ' . home_url(),
             ],
-            CURLOPT_POSTFIELDS        => json_encode([
-                'model'    => $model,
-                'stream'   => true,
-                'messages' => $messages,
-            ]),
-            CURLOPT_WRITEFUNCTION     => function ($ch, $chunk) {
-                echo $chunk;
-                @ob_flush();
-                flush();
-                return strlen($chunk);
-            },
-        ]);
+            $stream_body,
+            true
+        );
 
         curl_exec($ch);
 
@@ -105,5 +101,32 @@ class My_Plugin_Stream_Handler
 
         curl_close($ch);
         exit;
+    }
+
+
+    private function setup_curl(string $url, string $api_key, array $headers, string $body, bool $is_stream = false)
+    {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => !$is_stream,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_POSTFIELDS => $body,
+        ]);
+
+        if ($is_stream) {
+            curl_setopt($ch, CURLOPT_WRITEFUNCTION, function ($ch, $chunk) {
+                echo $chunk;
+                @ob_flush();
+                flush();
+                return strlen($chunk);
+            });
+        }
+
+        // Add common timeout settings
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $is_stream ? 60 : 20);
+
+        return $ch;
     }
 }
