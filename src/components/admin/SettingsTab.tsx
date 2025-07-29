@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import useEnvironments from "../../hooks/useEnvironments";
+import { remove } from "../../utils/api";
 import { MyPluginData } from "../../utils/constant";
+import endpoints from "../../utils/endpoints";
 
 export const SettingsTab = () => {
     const { environments, setEnvironments } = useEnvironments();
     // const [environments, setEnvironments] = useState<EnvironmentConfig[]>([]);
-    const [activeEnvId, setActiveEnvId] = useState<string | null>(null);
+    const [activeEnvId, setActiveEnvId] = useState<string>("");
 
     const types = [
         'OpenAI',
@@ -35,15 +38,22 @@ export const SettingsTab = () => {
         setActiveEnvId(newId);
     };
 
-    const deleteEnvironment = () => {
-        // const filtered = environments.filter(env => env.id !== activeEnvId);
-        // setEnvironments(filtered);
-        // setActiveEnvId(filtered[0]?.id || '');
+    const deleteEnvironment = async () => {
+        try {
+            await remove(endpoints.environments.byId(activeEnvId));
+            const filtered = environments.filter(env => env.id !== activeEnvId);
+            setEnvironments(filtered);
+            setActiveEnvId(filtered[0]?.id || '');
+            toast.success("Environment deleted!");
+        } catch (error: any) {
+            console.log("Error to delete environment: ", error?.response?.data);
+            toast.error(error?.response?.data?.message);
+        }
     };
 
     useEffect(() => {
         if (!activeEnvId && environments?.length) {
-            setActiveEnvId(environments[0]?.id)
+            setActiveEnvId(environments[0]?.id);
         }
     }, [environments])
 
@@ -61,9 +71,9 @@ export const SettingsTab = () => {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    alert('Environments saved successfully!');
+                    toast.success('Environments saved successfully!');
                 } else {
-                    alert('Failed to save.');
+                    toast.error('Failed to save.');
                 }
             });
     };
