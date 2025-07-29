@@ -11,6 +11,8 @@ class My_Plugin_Tool_Dispatcher
                 return self::summarize_json_data($args['json_string'] ?? '');
             case 'get_biodata':
                 return self::get_biodata($args['name'] ?? '');
+            case 'searchGutenbergBooks':
+                return self::searchGutenbergBooks($args['search_terms'] ?? '');
             default:
                 return ['error' => 'Tool not found'];
         }
@@ -67,5 +69,27 @@ class My_Plugin_Tool_Dispatcher
     private static function summarize_json_data(string $json): array
     {
         // Parse and summarize
+    }
+
+    private static function searchGutenbergBooks($searchTerms)
+    {
+        $searchQuery = implode(' ', $searchTerms);
+        $url = "https://gutendex.com/books?search=" . urlencode($searchQuery);
+
+        $response = file_get_contents($url);
+        if ($response === false) return [];
+
+        $data = json_decode($response, true);
+        $results = [];
+
+        foreach ($data['results'] as $book) {
+            $results[] = [
+                'id' => $book['id'],
+                'title' => $book['title'],
+                'authors' => $book['authors'],
+            ];
+        }
+
+        return $results;
     }
 }

@@ -21,31 +21,40 @@ class My_Plugin_Stream_Handler
         if ($context && empty($has_system)) {
             array_unshift($messages, ['role' => 'system', 'content' => $context]);
         }
+
+        $tools = My_Plugin_Tool_Registry::get_all_tools();
+
         // Step 1: Dry-run request (no stream) to check for tool calls
-        $dry_body = wp_json_encode([
-            'model'       => $model,
-            'messages'    => $messages,
-            'tools'       => My_Plugin_Tool_Registry::get_all_tools(),
+        $body = wp_json_encode([
+            'model'    => $model,
+            'messages' => $messages,
+            'tools'    => $tools,
             'tool_choice' => 'auto',
         ]);
-        $dry_response = wp_remote_post("{$base_url}/chat/completions", [
-            'headers' => [
-                "Authorization" => "Bearer {$api_key}",
-                'Content-Type'  => 'application/json',
-                'Referer'       => home_url(),
-            ],
-            'body'    => $dry_body,
-            'timeout' => 20,
-        ]);
 
-        if (is_wp_error($dry_response)) {
+        $ch = curl_init("$base_url/chat/completions");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Authorization: Bearer $api_key",
+            'Content-Type: application/json',
+            'Referer: ' . home_url(),
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
             status_header(500);
-            echo "API Error: " . esc_html($dry_response->get_error_message());
+            echo "cURL Error: " . curl_error($ch);
+            curl_close($ch);
             exit;
         }
-        $data = json_decode(wp_remote_retrieve_body($dry_response), true);
+        curl_close($ch);
+        $data = json_decode($response, true);
         $tool_calls = $data['choices'][0]['message']['tool_calls'] ?? [];
-
+        
         // Step 2: Handle tool calls if present
         if (!empty($tool_calls)) {
             foreach ($tool_calls as $tool) {
@@ -57,36 +66,6 @@ class My_Plugin_Stream_Handler
                     'content' => json_encode($tool_result),
                 ];
             }
-
-            // Final request after tool execution (non-streaming)
-            $final_response = wp_remote_post("{$base_url}/chat/completions", [
-                'headers' => [
-                    "Authorization" => "Bearer {$api_key}",
-                    'Content-Type'  => 'application/json',
-                    'Referer'       => home_url(),
-                ],
-                'body'    => wp_json_encode([
-                    'model'    => $model,
-                    'messages' => $messages,
-                ]),
-                'timeout' => 20,
-            ]);
-
-            if (is_wp_error($final_response)) {
-                status_header(500);
-                echo "Final API Error: " . esc_html($final_response->get_error_message());
-                exit;
-            }
-
-            $final_data = json_decode(wp_remote_retrieve_body($final_response), true);
-            $reply = $final_data['choices'][0]['message']['content'] ?? '[No response]';
-
-            header('Content-Type: application/json');
-            echo json_encode([
-                'type'  => 'final',
-                'reply' => $reply,
-            ]);
-            exit;
         }
 
         // Step 3: No tool calls – stream the result
@@ -94,13 +73,13 @@ class My_Plugin_Stream_Handler
         header('Cache-Control: no-cache');
         header('Connection: keep-alive');
 
-        $ch = curl_init("{$base_url}/chat/completions");
+        $ch = curl_init("$base_url/chat/completions");
 
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER    => false,
             CURLOPT_POST              => true,
             CURLOPT_HTTPHEADER        => [
-                "Authorization: Bearer {$api_key}",
+                "Authorization: Bearer $api_key",
                 'Content-Type: application/json',
                 'Accept: text/event-stream',
                 'Referer: ' . home_url(),
