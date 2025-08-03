@@ -61,6 +61,7 @@ class My_Plugin_Stream_Handler
             foreach ($tool_calls as $tool) {
                 $args = json_decode($tool['function']['arguments'] ?? '{}', true);
                 $tool_result = My_Plugin_Tool_Dispatcher::run($tool['function']['name'], $args);
+                // my_plugin_log($tool_result);
                 $messages[] = [
                     'role'    => 'tool',
                     'name'    => $tool['function']['name'],

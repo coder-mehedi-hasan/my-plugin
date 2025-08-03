@@ -9,6 +9,7 @@ type ChatbotConfig = {
     environment: EnvironmentConfig | null;
     model: string;
     context: string;
+    temperature?: number
 };
 
 type Props = {
@@ -82,7 +83,19 @@ const ChatbotEditor: React.FC<Props> = ({
                     {error && <p className="text-sm text-red-500">{error}</p>}
                 </div>
             </div>
-
+            <div>
+                <label className="block font-medium mb-1">Temperature (0 - 2)</label>
+                <input
+                    type="number"
+                    className="w-full border p-2 rounded"
+                    min={0}
+                    max={2}
+                    step={0.1}
+                    value={bot.temperature}
+                    onChange={e => updateBot({ temperature: parseFloat(e.target.value) })}
+                    placeholder="Set LLM temperature (e.g. 0.7)"
+                />
+            </div>
             <div>
                 <label className="block font-medium mb-1">Context</label>
                 <textarea
