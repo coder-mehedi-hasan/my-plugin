@@ -140,9 +140,11 @@ class My_Plugin_OpenRouter_Engine implements My_Plugin_Engine_Interface
         $raw_base  = trim($params['baseUrl'] ?? '');
         $base_url  = esc_url_raw($raw_base) ?: $this->base_url;
         $messages  = $params['messages'] ?? [];
+        $temperature = $params['temperature'] ?? null;
+
 
         $handler = new My_Plugin_Stream_Handler();
-        $handler->handle($base_url, $api_key, $model, $messages, $context);
+        $handler->handle($base_url, $api_key, $model, $messages, $context, $temperature);
     }
 
     public function fetch_models(array $params): WP_REST_Response|WP_Error

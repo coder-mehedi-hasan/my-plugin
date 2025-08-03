@@ -8,7 +8,7 @@ require_once MY_PLUGIN_PATH . 'tools/class-tool-dispatcher.php';
 
 class My_Plugin_Stream_Handler
 {
-    public function handle(string $base_url, string $api_key, string $model, array $messages, string $context)
+    public function handle(string $base_url, string $api_key, string $model, array $messages, string $context, ?float $temperature = null)
     {
         if (empty($api_key) || empty($model) || !is_array($messages) || empty($messages)) {
             status_header(400);
@@ -25,12 +25,18 @@ class My_Plugin_Stream_Handler
         $tools = My_Plugin_Tool_Registry::get_all_tools();
 
         // Step 1: Dry-run request (no stream) to check for tool calls
-        $body = json_encode([
-            'model'    => $model,
-            'messages' => $messages,
-            'tools'    => $tools,
+        $payload = [
+            'model'       => $model,
+            'messages'    => $messages,
+            'tools'       => $tools,
             'tool_choice' => 'auto',
-        ]);
+        ];
+
+        if (isset($temperature) && is_numeric($temperature) && $temperature >= 0 && $temperature <= 2) {
+            $payload['temperature'] = (float) $temperature;
+        }
+
+        $body = json_encode($payload);
 
         $ch = $this->setup_curl(
             "$base_url/chat/completions",
@@ -75,11 +81,17 @@ class My_Plugin_Stream_Handler
         header('Cache-Control: no-cache');
         header('Connection: keep-alive');
 
-        $stream_body = json_encode([
+        $payload = [
             'model'    => $model,
             'stream'   => true,
             'messages' => $messages,
-        ]);
+        ];
+
+        if (isset($temperature) && is_numeric($temperature) && $temperature >= 0 && $temperature <= 2) {
+            $payload['temperature'] = (float) $temperature;
+        }
+
+        $stream_body = json_encode($payload);
 
         $ch = $this->setup_curl(
             "$base_url/chat/completions",
